@@ -1,0 +1,80 @@
+Resources:
+  ymlVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+       CidrBlock: 10.0.0.0/21
+       Tags:
+        - Key: Name
+          Value: ymlVPC2
+
+  ymlIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: ymlIGW2
+
+  ymlIGWattach:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref ymlIGW
+      VpcId: !Ref ymlVPC
+
+  ymlSUB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: ap-northeast-1a
+      Tags: 
+        - Key: Name
+          Value: ymlSUB2
+      VpcId: !Ref ymlVPC
+
+  ymlRTB:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags: 
+        - Key: Name
+          Value: yumRTB2
+      VpcId: !Ref ymlVPC
+
+  ymlRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref ymlRTB
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref ymlIGW
+
+  ymlRTBandSUB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref ymlRTB
+      SubnetId: !Ref ymlSUB
+  
+  ymlSGP:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: yumSGP2
+      GroupName: yumSGP2
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref ymlVPC
+
+  ymlEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: ap-northeast-1a
+      ImageId: ami-0a6fd4c92fc6ed7d5
+      InstanceType: t2.micro
+      KeyName: yml-key
+      SecurityGroupIds: 
+        - !Ref ymlSGP
+      SubnetId: !Ref ymlSUB
+      Monitoring: true
+      Tags: 
+        - Key: Name
+          Value: yumEC22

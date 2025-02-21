@@ -1,0 +1,13 @@
+#testVPC
+Resources:
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/24
+  MyIGW:
+    Type: AWS::EC2::InternetGateway
+  MyIGWattach:
+    Type: AWS::EC2::VPCGatewayAttachment #IGWattachはVPCGate
+    Properties:
+      VpcId: !Ref MyVPC #!Refで上のものを指定できる
+      InternetGatewayId: !Ref MyIGW
